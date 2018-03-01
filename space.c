@@ -3,6 +3,7 @@
 #include <string.h>
 #include "types.h"
 #include "space.h"
+#include "set.h"
 #include "object.h"
 
 struct _Space {
@@ -12,7 +13,7 @@ struct _Space {
 	Id south;
 	Id east;
 	Id west;
-	Object* object;
+	Set* object;
 };
 /* request a block of memory for struct "space" with choosen id*/
 Space* space_create(Id id)
@@ -24,7 +25,7 @@ Space* space_create(Id id)
 
 	newSpace = (Space *)malloc(sizeof(Space));
 
-	if (newSpace == NULL) 
+	if (newSpace == NULL)
 	{
 		return NULL;
 	}
@@ -36,8 +37,9 @@ Space* space_create(Id id)
 	newSpace->south = NO_ID;
 	newSpace->east = NO_ID;
 	newSpace->west = NO_ID;
+	//zmiana
+	newSpace->object = set_create();
 
-	newSpace->object = object_create(NO_ID);
 
 	return newSpace;
 }
@@ -47,8 +49,8 @@ STATUS space_destroy(Space* space)
 	if (!space) {
 		return ERROR;
 	}
+	set_destroy(space->object);
 
-	object_destroy(space->object);
 	free(space);
 	space = NULL;
 
@@ -57,7 +59,7 @@ STATUS space_destroy(Space* space)
 /*Setting the name of space*/
 STATUS space_set_name(Space* space, char* name)
 {
-	if (!space || !name) 
+	if (!space || !name)
 	{
 		return ERROR;
 	}
@@ -70,9 +72,9 @@ STATUS space_set_name(Space* space, char* name)
 	return OK;
 }
 /*Setting the north index of connection in the space */
-STATUS space_set_north(Space* space, Id id) 
+STATUS space_set_north(Space* space, Id id)
 {
-	if (!space || id == NO_ID) 
+	if (!space || id == NO_ID)
 	{
 		return ERROR;
 	}
@@ -90,7 +92,7 @@ STATUS space_set_south(Space* space, Id id)
 	return OK;
 }
 /*Setting the east index of connection in the space*/
-STATUS space_set_east(Space* space, Id id) 
+STATUS space_set_east(Space* space, Id id)
 {
 	if (!space || id == NO_ID)
 	{
@@ -102,7 +104,7 @@ STATUS space_set_east(Space* space, Id id)
 /*Setting the west index of connection in the space */
 STATUS space_set_west(Space* space, Id id)
 {
-	if (!space || id == NO_ID) 
+	if (!space || id == NO_ID)
 	{
 		return ERROR;
 	}
@@ -110,33 +112,34 @@ STATUS space_set_west(Space* space, Id id)
 	return OK;
 }
 /*Setting the object into the space*/
-STATUS space_set_object(Space* space, Object* object) 
+
+
+STATUS space_set_object(Space* space, Object* object)
 {
 	if (!space || !object)
 	{
 		return ERROR;
 	}
 
-
+	
 	if (space->object != NULL)
 	{
 		return ERROR;
 	}
-
-	space->object = object;
+	add_value(space->object, object->id)
 	return OK;
 }
 /*Getting the space name */
 const char * space_get_name(Space* space)
 {
-	if (!space) 
+	if (!space)
 	{
 		return NULL;
 	}
 	return space->name;
 }
 /*Getting item of space */
-Id space_get_id(Space* space) 
+Id space_get_id(Space* space)
 {
 	if (!space)
 	{
@@ -154,9 +157,9 @@ Id space_get_north(Space* space)
 	return space->north;
 }
 /*Getting the index of linked for the south*/
-Id space_get_south(Space* space) 
+Id space_get_south(Space* space)
 {
-	if (!space) 
+	if (!space)
 	{
 		return NO_ID;
 	}
@@ -165,7 +168,7 @@ Id space_get_south(Space* space)
 /*Getting the index of linked for the east*/
 Id space_get_east(Space* space)
 {
-	if (!space) 
+	if (!space)
 	{
 		return NO_ID;
 	}
@@ -174,20 +177,33 @@ Id space_get_east(Space* space)
 /*Getting the index of linked for the west*/
 Id space_get_west(Space* space)
 {
-	if (!space) 
+	if (!space)
 	{
 		return NO_ID;
 	}
 	return space->west;
 }
+
 /*Getting of object position*/
-Object* space_get_object(Space* space)
+Set* space_get_set(Space* space)
 {
 	if (!space)
 	{
 		return NULL;
 	}
 	return space->object;
+}
+
+STATUS space_add_object(Space* space, Object* object) {
+
+	add_value(space->object, object->id);
+	return OK;
+}
+
+STATUS space_remove_object(Space* space, Object* object) {
+
+	remove_value(space->object, object->id);
+	return OK;
 }
 /*Showing linked between directions. If there is a connection, it will display the index of the item. In another case,
 it will display a message of no link.*/
@@ -203,7 +219,7 @@ STATUS space_print(Space* space)
 	fprintf(stdout, "--> Space (Id: %ld; Name: %s)\n", space->id, space->name);
 
 	idaux = space_get_north(space);
-	if (NO_ID != idaux) 
+	if (NO_ID != idaux)
 	{
 		fprintf(stdout, "---> North link: %ld.\n", idaux);
 	}
@@ -213,27 +229,27 @@ STATUS space_print(Space* space)
 	}
 
 	idaux = space_get_south(space);
-	if (NO_ID != idaux) 
+	if (NO_ID != idaux)
 	{
 		fprintf(stdout, "---> South link: %ld.\n", idaux);
 	}
-	else 
+	else
 	{
 		fprintf(stdout, "---> No south link.\n");
 	}
 
 	idaux = space_get_east(space);
-	if (NO_ID != idaux) 
+	if (NO_ID != idaux)
 	{
 		fprintf(stdout, "---> East link: %ld.\n", idaux);
 	}
-	else 
+	else
 	{
 		fprintf(stdout, "---> No east link.\n");
 	}
 
 	idaux = space_get_west(space);
-	if (NO_ID != idaux) 
+	if (NO_ID != idaux)
 	{
 		fprintf(stdout, "---> West link: %ld.\n", idaux);
 	}
@@ -242,9 +258,9 @@ STATUS space_print(Space* space)
 		fprintf(stdout, "---> No west link.\n");
 	}
 
-	if (space_get_object(space))
+	if (space_get_set(space))
 	{
-		object_print(space->object);
+		set_print(space->object);
 	}
 
 	return OK;

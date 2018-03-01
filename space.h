@@ -13,6 +13,7 @@
 
 #include "types.h"
 #include "object.h"
+#include "set.h"
 
 typedef struct _Space Space;
 
@@ -34,7 +35,9 @@ Id space_get_east(Space* space);
 STATUS space_set_west(Space* space, Id id);
 Id space_get_west(Space* space);
 STATUS space_set_object(Space* space, Object* object);
-Object* space_get_object(Space* space);
+Set* space_get_set(Space* space);
+STATUS space_add_object(Space* space, Object* object);
+STATUS space_remove_object(Space* space, Object* object);
 STATUS space_print(Space* space);
 
 #endif
