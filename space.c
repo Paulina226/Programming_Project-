@@ -6,7 +6,7 @@
 #include "set.h"
 #include "object.h"
 
-struct _Space {
+struct Space {
 	Id id;
 	char name[WORD_SIZE + 1];
 	Id north;
@@ -14,7 +14,9 @@ struct _Space {
 	Id east;
 	Id west;
 	Set* object;
+	char gdesc[max_r][max_c];
 };
+/* request a block of memory for struct "space" with choosen id*/
 /* request a block of memory for struct "space" with choosen id*/
 Space* space_create(Id id)
 {
@@ -37,10 +39,15 @@ Space* space_create(Id id)
 	newSpace->south = NO_ID;
 	newSpace->east = NO_ID;
 	newSpace->west = NO_ID;
-	//zmiana
 	newSpace->object = set_create();
-
-
+	int i, j;
+	for (i = 0; i < max_r; i++)
+	{
+		for (j = 0; i < max_c; i++) {
+			newSpace->gdesc[i][j] = '\0';
+		}
+		
+	}
 	return newSpace;
 }
 /*destroying the space - deallocate memory block */
@@ -49,8 +56,14 @@ STATUS space_destroy(Space* space)
 	if (!space) {
 		return ERROR;
 	}
+	//zmiana
 	set_destroy(space->object);
-
+	// zmiana
+	int i ;
+	for (i = 0; i<max_r; i++)
+	{
+		free(space->gdesc[i]);
+	}
 	free(space);
 	space = NULL;
 
@@ -71,6 +84,22 @@ STATUS space_set_name(Space* space, char* name)
 
 	return OK;
 }
+
+/*Setting the name of space*/
+STATUS space_set_gdesc(Space* space,int line, char* gdesc)
+{
+	if (!space || !gdesc)
+	{
+		return ERROR;
+	}
+	if (!strcpy(space->gdesc[line], gdesc))
+	{
+		return ERROR;
+	}
+
+	return OK;
+}
+
 /*Setting the north index of connection in the space */
 STATUS space_set_north(Space* space, Id id)
 {
@@ -114,21 +143,7 @@ STATUS space_set_west(Space* space, Id id)
 /*Setting the object into the space*/
 
 
-STATUS space_set_object(Space* space, Object* object)
-{
-	if (!space || !object)
-	{
-		return ERROR;
-	}
 
-	
-	if (space->object != NULL)
-	{
-		return ERROR;
-	}
-	add_value(space->object, object->id)
-	return OK;
-}
 /*Getting the space name */
 const char * space_get_name(Space* space)
 {
@@ -138,6 +153,16 @@ const char * space_get_name(Space* space)
 	}
 	return space->name;
 }
+
+char *  space_get_gdesc(Space* space, int line)
+{
+	if (!space)
+	{
+		return NULL;
+	}
+	return space->gdesc[line];
+}
+
 /*Getting item of space */
 Id space_get_id(Space* space)
 {
@@ -194,15 +219,24 @@ Set* space_get_set(Space* space)
 	return space->object;
 }
 
-STATUS space_add_object(Space* space, Object* object) {
+STATUS space_add_object(Space* space, Id id) {
 
-	add_value(space->object, object->id);
+	add_value(space->object, id);
 	return OK;
 }
+STATUS space_set_object(Space* space, Object* object)
+{
+	if (!space || !object)
+	{
+		return ERROR;
+	}
 
-STATUS space_remove_object(Space* space, Object* object) {
 
-	remove_value(space->object, object->id);
+	if (space->object != NULL)
+	{
+		return ERROR;
+	}
+	space_add_object(space, object->id);
 	return OK;
 }
 /*Showing linked between directions. If there is a connection, it will display the index of the item. In another case,
@@ -210,7 +244,7 @@ it will display a message of no link.*/
 STATUS space_print(Space* space)
 {
 	Id idaux = NO_ID;
-
+	char* test[max_r] = { {0} };
 	if (!space)
 	{
 		return ERROR;
@@ -262,6 +296,12 @@ STATUS space_print(Space* space)
 	{
 		set_print(space->object);
 	}
-
+	int i;
+	for (i = 0; i < max_r; i++)
+	{
+		test[i] = space_get_gdesc(space, i);
+		fprintf(stdout, "---> %s.\n", test[i]);
+	}
+	
 	return OK;
 }

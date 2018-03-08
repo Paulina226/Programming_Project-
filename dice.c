@@ -1,25 +1,41 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-#include "game.h"
+#include "types.h"
+#include "dice.h"
 
-#define MAX_VALUE 6
 
 struct _Dice{
-	
+
 	Id id;
-	int val;	
+	int val;
 
 };
 
-STATUS dice_create(Dice* dice)
+Dice* dice_create()
 {
-	
-	dice = (Dice*)malloc(sizeof(Dice));
+
+	Dice *dice;
+
+	dice = (Dice*) malloc(sizeof(Dice));
 
 	dice->id = NO_ID;
 
 	dice->val = -1;
+
+	return dice;
+}
+
+STATUS dice_set_val(Dice* dice, int value){
+
+	dice->val = value;
+
+	return OK;
+}
+
+STATUS dice_set_id(Dice* dice, Id id){
+
+	dice->id = id;
 
 	return OK;
 }
@@ -31,49 +47,26 @@ void dice_destroy(Dice* dice){
 	return;
 }
 
-int dice_roll(Dice* dice){
+STATUS dice_roll(Dice* dice){
 
-	int val;
+	if(!dice){
 
+		return ERROR;
+
+	}
 	srand(time(NULL));
 
+	dice_set_val(dice,((rand()% MAX_VALUE) +1));
 
-	dice->val = ((rand()% MAX_VALUE) +1);
-
-	val = dice->val;
-
-	return val;	
+	return OK;
 
 }
-
 
 void dice_print(Dice* dice){
 
+	fprintf(stdout,"-->Id:%ld\n",dice->id);
 
-	fprintf(stdout,"-->Id:%ld",dice->id);
-
-	fprintf(stdout,"-->Value:%i",dice->val);
+	fprintf(stdout,"-->Value:%i\n",dice->val);
 
 	return;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
