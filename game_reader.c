@@ -86,7 +86,7 @@ STATUS game_load_spaces(Game* game, char* filename)
 	char name[WORD_SIZE] = "";
 	char* toks = NULL;
 	Id id = NO_ID, north = NO_ID, east = NO_ID, south = NO_ID, west = NO_ID;
-	char gdesc[max_z][max_c] = { { 0 } };
+	char gdesc[max_r][max_c] = { { 0 } };
 	Space* space = NULL;
 	STATUS status = OK;
 
