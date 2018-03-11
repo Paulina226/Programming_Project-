@@ -16,7 +16,7 @@
 #define N_CMD 10
 
 /*Codifies player inputs if they are a string*/
-char *cmd_to_str[N_CMD] = { "No command", "Unknown", "Exit", "Following", "Previous", "Graps" , "Drop", "Left " , "Right" ,"Roll the dice" };
+char *cmd_to_str[N_CMD] = { "No command", "Unknown", "Exit", "Following", "Previous", "Graps" , "Drop", "Left " , "Right","Roll the dice" };
 
 /*Codifies player inputs if they are a single character*/
 char *short_cmd_to_str[N_CMD] = { "","","e","f","p","g","d","l","r","t" };

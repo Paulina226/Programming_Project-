@@ -23,7 +23,7 @@ typedef struct _Game {
 	Player* player;
 	Object* object[max_o];
 	Space* spaces[MAX_SPACES + 1];
-	Dice* d;
+	Dice* dice;
 	T_Command last_cmd;
 } Game;
 
@@ -46,9 +46,7 @@ void   game_print_data(Game* game);
 
 Id     game_get_player_location(Game* game);
 
-Id     game_get_object_location(Game* game);
-
-Space* game_get_space(Game* g, int s_num);
+Id     game_get_object_location(Game* game, Id id);
 
 T_Command game_get_last_command(Game* game);
 

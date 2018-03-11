@@ -22,7 +22,7 @@ typedef enum enum_Command {
 	GRAPS,
 	DROP,
 	LEFT,
-	RIGHT
+	RIGHT,
 	ROLL_THE_DICE
 } T_Command;
 

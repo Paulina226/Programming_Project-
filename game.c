@@ -17,6 +17,7 @@
 #include "player.h"
 #include "object.h"
 #include "set.h"
+#include "dice.h"
 
 #define N_CALLBACK 7
 
@@ -24,7 +25,7 @@
 	Define the function type for the callbacks
  */
  
- //Paulina to Adrian: In my opinion it should be removed
+ /*Paulina to Adrian: In my opinion it should be removed*/
 //typedef void(*callback_fn)(Game* game);
 
 /**
@@ -40,7 +41,7 @@ void game_callback_graps(Game* game, Id id);
 void game_callback_drop(Game* game);
 void game_callback_roll_the_dice(Game* game);
 
-//Paulina to Adiran: it should be also removed
+/*Paulina to Adiran: it should be also removed */
 /*static callback_fn game_callback_fn_list[N_CALLBACK] = {
   game_callback_unknown,
   game_callback_exit,
@@ -70,25 +71,19 @@ STATUS game_create(Game* game)
 	{
 		game->spaces[i] = NULL;
 	}
-	//Paulina to Adrian: If it deosn't work, it should be changed to 1
+	/*Paulina to Adrian: If it deosn't work, it should be changed to 1*/
 	game->player = player_create(NO_ID);
 	for (i = 0; i < max_o; i++)
 	{
-		game->object[i] = NO_ID;
+		game->object[i] = NULL;
 	}	
 	game->last_cmd = NO_CMD;
 
-  game->dice = dice_create();
+  	game->dice = dice_create();
 
 	return OK;
 }
-Space* game_get_space(Game* g, int s_num){
 
-  if (!g)
-    return NULL;
-
-  return game->space[s_num-1];
-}
 /*Creating a game based on data from files */
 STATUS game_create_from_file(Game* game, char* filename)
 {
@@ -149,7 +144,7 @@ STATUS game_set_object_location(Game* game, Id id)
 	for(i=0;i<(MAX_SPACES+1);i++){
 		if (space_get_id(game->spaces[i]) == id)
 		{
-			add_value(game->set, id)
+			add_value(game->object, id)
 			space_set_object(game->spaces[i],object_create(id));
 		}
 	}
@@ -181,14 +176,21 @@ Id game_get_object_location(Game* game, Id id)
 	int i,j;
   Set* set=NULL;
 
-	for (i = 0;i<(MAX_SPACES+1);i++){
-		if(space_get_object(game->spaces[i])){
-      for (j=0;j<set_get_number(Set* space_get_set(game->spaces[i]));j++){
-        set = space_get_set(spaces[i]);
-        if (!set_get_ids(set[j],id)){
-          return space_get_id(game->spaces[i]);
-        }
-      }
+	for (i = 0;i<(MAX_SPACES+1);i++)
+	{
+		if(space_get_object(game->spaces[i])==id)
+		{
+			/* I don't what's going on here but in this place is error*/
+      			for (j=0;j<set_get_number((Set*) space_get_set(game->spaces[i]));j++)
+			{
+				/*Next error*/
+        			set = space_get_set(spaces[i]);
+				/*Next error*/
+        			if (!set_get_ids(set[j],id))
+				{
+          				return space_get_id(game->spaces[i]);
+       			 	}
+      			}
 		}
 	}
 
@@ -198,7 +200,7 @@ Id game_get_object_location(Game* game, Id id)
 STATUS game_update(Game* game, T_Command cmd)
 {
 	game->last_cmd = cmd;
-	//Paulina to Adrian: It should be removed
+	/*Paulina to Adrian: It should be removed*/
 	//(*game_callback_fn_list[cmd])(game);
 	return OK;
 }
@@ -351,7 +353,7 @@ void game_callback_drop(Game* game) {
 
 			if (player_get_object(game->player) != NO_ID)
 			{
-				space_add_object(game->spaces[i],object_get_by_id(object) );
+				space_set_object(game->spaces[i],object_get_by_id(game,object) );
 				
 				//assigning the object to the player
 				player_set_object(game->player, NO_ID);
