@@ -107,15 +107,28 @@ Id  set_get_ids(Set* set, Id id)
 	{
 		return NULL;
 	}
+	if(checking_object_in_set(set,id)==OK)
+	{
+		return set->ids[i]
+	}
+	return  ERROR;
+}
+
+STATUS checking_object_in_set(Set* set, Id id){
+	if (!set)
+	{
+		return NULL;
+	}
 	int i;
 	for (i = 0; i < max && i != NO_ID; i++)
 	{
 		if (set->ids[i] == id)
-			return  set->ids[id];
+			return  OK;
 	}
 
 
 	return  ERROR;
+
 }
 //Getting the value of card (the number of ids)
 int set_get_number(Set* set)

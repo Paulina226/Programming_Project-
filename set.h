@@ -21,6 +21,7 @@ STATUS set_card(Set* set, int card);
 STATUS set_Ids(Set* set, Id* ids);
 STATUS add_value(Set* set, Id id);
 STATUS remove_value(Set* set, Id id);
+STATUS checking_object_in_set(Set* set, Id id);
 Id  set_get_ids(Set* set, Id id);
 int set_get_number(Set* set);
 STATUS set_print(Set* set);

@@ -16,6 +16,7 @@
 #include "space.h"
 #include "player.h"
 #include "object.h"
+#icnlude "dice.h"
 
 #define max_o 4
  /*Strcture containing player and object locations, a variable number of space containing structures and an input command*/

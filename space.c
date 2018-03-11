@@ -172,6 +172,23 @@ Id space_get_id(Space* space)
 	}
 	return space->id;
 }
+/*Getting item of space */
+Id space_get_object(Space* space, Id id)
+{
+	if (!space)
+	{
+		return NO_ID;
+	}
+	int i;
+	for(i=0;i<max; i++)
+	{
+		if(set_get_ids(space[i]->object,id)==id)
+		{
+			return space[i]->id;
+		}
+	}
+	return ERROR;
+}
 /*Getting the index of linked for the north*/
 Id space_get_north(Space* space)
 {

@@ -144,7 +144,7 @@ STATUS game_set_object_location(Game* game, Id id)
 	for(i=0;i<(MAX_SPACES+1);i++){
 		if (space_get_id(game->spaces[i]) == id)
 		{
-			add_value(game->object, id)
+			add_value(game->object, id);
 			space_set_object(game->spaces[i],object_create(id));
 		}
 	}
@@ -178,7 +178,9 @@ Id game_get_object_location(Game* game, Id id)
 
 	for (i = 0;i<(MAX_SPACES+1);i++)
 	{
-		if(space_get_object(game->spaces[i])==id)
+
+/* I changed it and i added ner function in space and set*/
+		if(space_get_object(game->spaces[i], Id)==id)
 		{
 			/* I don't what's going on here but in this place is error*/
       			for (j=0;j<set_get_number((Set*) space_get_set(game->spaces[i]));j++)
@@ -353,7 +355,7 @@ void game_callback_drop(Game* game) {
 
 			if (player_get_object(game->player) != NO_ID)
 			{
-				space_set_object(game->spaces[i],object_get_by_id(game,object) );
+				space_set_object(game->spaces[i],object_get_by_id(game,player->object) );
 				
 				//assigning the object to the player
 				player_set_object(game->player, NO_ID);
