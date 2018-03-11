@@ -14,7 +14,7 @@
 
 typedef struct _Set Set;
 
-#define max 10
+#define max 4
 
 Set* set_create();
 STATUS set_card(Set* set, int card);

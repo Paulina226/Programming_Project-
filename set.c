@@ -26,6 +26,8 @@ Set* set_create() {
 	newSet->card = 0;
 	return newSet;
 }
+
+/*destroying the space - deallocate memory block */
 STATUS set_destroy(Set* set)
 {
 	if (!set) {
@@ -37,7 +39,7 @@ STATUS set_destroy(Set* set)
 
 	return OK;
 }
-
+/*Setting the value of card (number of ids)*/
 STATUS set_card(Set* set, int card)
 {
 	if (!set || card == -1)
@@ -47,6 +49,7 @@ STATUS set_card(Set* set, int card)
 	set->card = card;
 	return OK;
 }
+/*Setting the list of ids */
 STATUS set_Ids(Set* set, Id* ids)
 {
 	if (!set || !ids)
@@ -59,7 +62,7 @@ STATUS set_Ids(Set* set, Id* ids)
 	}
 	return OK;
 }
-
+//Adding a new id value to the vector of ids
 STATUS add_value(Set* set, Id id) {
 	int index = set->card;
 	set->ids[index] = id;
@@ -67,6 +70,7 @@ STATUS add_value(Set* set, Id id) {
 	set_card(set, len + 1);
 	return OK;
 }
+//Removing a given value from the vector id
 STATUS remove_value(Set* set, Id id) {
 	Id current_id = NO_ID;
 	int counter = set->card;
@@ -96,15 +100,24 @@ STATUS remove_value(Set* set, Id id) {
 	set_Ids(set, tmpWord);
 	return OK;
 }
+//Getting id from the vector of ids
 Id  set_get_ids(Set* set, Id id)
 {
 	if (!set)
 	{
 		return NULL;
 	}
+	int i;
+	for (i = 0; i < max && i != NO_ID; i++)
+	{
+		if (set->ids[i] == id)
+			return  set->ids[id];
+	}
 
-	return  set->ids[id];
+
+	return  ERROR;
 }
+//Getting the value of card (the number of ids)
 int set_get_number(Set* set)
 {
 	if (!set)
@@ -114,6 +127,7 @@ int set_get_number(Set* set)
 	return set->card;
 }
 
+//Printing the vector of ids
 STATUS set_print(Set* set)
 {
 	Id idaux;

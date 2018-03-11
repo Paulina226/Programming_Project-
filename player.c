@@ -20,13 +20,13 @@ struct _Player {
 	Id id;
 	char name[WORD_SIZE + 1];
 	Id player_location;
-	Object* object;
+	Id object;
 };
 /*Creating a new player*/
 Player* player_create(Id id)
 {
 	Player *newPlayer = NULL;
-	
+
 	/*allocate memory for a new player*/
 	newPlayer = (Player *)malloc(sizeof(Player));
 
@@ -36,7 +36,7 @@ Player* player_create(Id id)
 	newPlayer->id = id;
 	newPlayer->name[0] = '\0';
 	newPlayer->player_location = NO_ID;
-	newPlayer->object = object_create(NO_ID);
+	newPlayer->object = NO_ID;
 
 	return newPlayer;
 }
@@ -69,9 +69,9 @@ STATUS player_set_name(Player* player, char* name)
 }
 
 /* Setting the id of the player */
-STATUS player_set_id(Player* player, Id id) 
+STATUS player_set_id(Player* player, Id id)
 {
-	if (!player || !id) 
+	if (!player || !id)
 	{
 		return ERROR;
 	}
@@ -80,9 +80,9 @@ STATUS player_set_id(Player* player, Id id)
 
 	return OK;
 }
-STATUS player_set_location(Player* player, Id id) 
+STATUS player_set_location(Player* player, Id id)
 {
-	if (!player || !id) 
+	if (!player || !id)
 	{
 		return ERROR;
 	}
@@ -94,7 +94,7 @@ STATUS player_set_location(Player* player, Id id)
 
 
 /* Setting the player object */
-STATUS player_set_object(Player* player, Object* object)
+STATUS player_set_object(Player* player, Id object)
 {
 	if (!player || !object)
 		return ERROR;
@@ -121,7 +121,7 @@ Id player_get_location(Player* player)
 	return player->player_location;
 }
 /* Getting the name of the player */
-const char * player_get_name(Player* player) 
+const char * player_get_name(Player* player)
 {
 	if (!player)
 	{
@@ -130,7 +130,7 @@ const char * player_get_name(Player* player)
 	return player->name;
 }
 /* Getting the object in the player structure */
-Object* player_get_object(Player* player)
+Id player_get_object(Player* player)
 {
 	if (!player)
 		return NULL;
@@ -146,7 +146,7 @@ STATUS player_print(Player* player)
 		return ERROR;
 	// Assign value of id player to the variable idaux
 	idaux = player_get_id(player);
-	// Checking if adaux has some value
+	// Checking if idaux has some value
 	if (NO_ID != idaux)
 		fprintf(stdout, "---> Player Id: %ld.\n", idaux);
 	else

@@ -152,3 +152,56 @@ STATUS game_load_spaces(Game* game, char* filename)
 	fclose(file);
 	return status;
 }
+/*Object loading function from file*/
+STATUS game_load_objects(Game* game, char* filename)
+{
+	FILE* file = NULL;
+	char line[WORD_SIZE] = "";
+	char name[WORD_SIZE] = "";
+	char symbol;
+	char* toks = NULL;
+	Id id = NO_ID;
+	Object* object = NULL;
+	STATUS status = OK;
+
+	if (!filename)
+		return ERROR;
+
+	file = fopen(filename, "r");
+	if (file == NULL)
+		return ERROR;
+	// Reading data values from a file
+	while (fgets(line, WORD_SIZE, file))
+	{
+		/*breaks 'line+3' into a series of tokens using the delimiter "|" */
+		if (strncmp("#s:", line, 3) == 0)
+		{
+			toks = strtok(line + 3, "|");
+			id = atol(toks);
+			toks = strtok(NULL, "|");
+			strcpy(name, toks);
+			toks = strtok(NULL, "|");
+			coord = atol(toks);
+
+
+#ifdef DEBUG
+			printf("Leido: %ld|%s|%ld\n", id, name, coord);
+#endif
+
+			object = object_create(id);
+
+			if (object != NULL)
+			{
+				object_set_id(object, id);
+				object_set_name(object, name);
+				space_set_object(game_get_space(game),object);
+			}
+		}
+	}
+
+	if (ferror(file))
+		status = ERROR;
+
+	fclose(file);
+	return status;
+}

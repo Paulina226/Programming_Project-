@@ -16,13 +16,16 @@
 #include "gamereader.h"
 #include "player.h"
 #include "object.h"
+#include "set.h"
 
 #define N_CALLBACK 7
 
  /**
 	Define the function type for the callbacks
  */
-typedef void(*callback_fn)(Game* game);
+ 
+ //Paulina to Adrian: In my opinion it should be removed
+//typedef void(*callback_fn)(Game* game);
 
 /**
    List of callbacks for each command in the game
@@ -31,17 +34,22 @@ void game_callback_unknown(Game* game);
 void game_callback_exit(Game* game);
 void game_callback_following(Game* game);
 void game_callback_previous(Game* game);
-void game_callback_pick_up(Game* game);
-void game_callback_put_in_place(Game* game);
+void game_callback_right(Game* game, Id id);
+void game_callback_left(Game* game, Id id);
+void game_callback_graps(Game* game, Id id);
+void game_callback_drop(Game* game);
+void game_callback_roll_the_dice(Game* game);
 
-static callback_fn game_callback_fn_list[N_CALLBACK] = {
+//Paulina to Adiran: it should be also removed
+/*static callback_fn game_callback_fn_list[N_CALLBACK] = {
   game_callback_unknown,
   game_callback_exit,
   game_callback_following,
   game_callback_previous,
   game_callback_pick_up,
-  game_callback_put_in_place 
-};
+  game_callback_put_in_place,
+  game_callback_roll_the_dice
+}; */
 
 /**
    Private functions
@@ -58,18 +66,28 @@ STATUS game_create(Game* game)
 {
 	int i;
 
-	for (i = 0; i < MAX_SPACES; i++) 
+	for (i = 0; i < MAX_SPACES; i++)
 	{
 		game->spaces[i] = NULL;
 	}
-
+	//Paulina to Adrian: If it deosn't work, it should be changed to 1
 	game->player = player_create(NO_ID);
-
-	game->object = object_create(NO_ID);
-
+	for (i = 0; i < max_o; i++)
+	{
+		game->object[i] = NO_ID;
+	}	
 	game->last_cmd = NO_CMD;
 
+  game->dice = dice_create();
+
 	return OK;
+}
+Space* game_get_space(Game* g, int s_num){
+
+  if (!g)
+    return NULL;
+
+  return game->space[s_num-1];
 }
 /*Creating a game based on data from files */
 STATUS game_create_from_file(Game* game, char* filename)
@@ -95,10 +113,21 @@ STATUS game_destroy(Game* game)
 		space_destroy(game->spaces[i]);
 	}
 
+  player_destroy(game->player);
+
+  dice_destroy(game->dice);
+
+  for (i = 0; (i < max_o) && (game->object[i] != NULL); i++)
+	{
+		object_destroy(game->object[i]);
+	}
+
+  free(game);
+
 	return OK;
 }
-/*Setting player localisation*/
-STATUS game_set_player_location(Game* game, Id id) 
+/*Setting player location*/
+STATUS game_set_player_location(Game* game, Id id)
 {
 	if (id == NO_ID) {
 		return ERROR;
@@ -108,68 +137,92 @@ STATUS game_set_player_location(Game* game, Id id)
 	return OK;
 }
 /*Setting object localization*/
-STATUS game_set_object_location(Game* game, Id id) 
+STATUS game_set_object_location(Game* game, Id id)
 {
 	int i = 0;
 
-	if (id == NO_ID) 
+	if (id == NO_ID)
 	{
 		return ERROR;
 	}
 
 	for(i=0;i<(MAX_SPACES+1);i++){
-		if (space_get_id(game->spaces[i]) == id){
-			space_set_object(game->spaces[i],object_create(NO_ID));
+		if (space_get_id(game->spaces[i]) == id)
+		{
+			add_value(game->set, id)
+			space_set_object(game->spaces[i],object_create(id));
 		}
 	}
 
 	return OK;
 }
 /*Getting player localisation*/
-Id game_get_player_location(Game* game) 
+Id game_get_player_location(Game* game)
 {
 	return player_get_location(game->player);
 }
-/*Getting object localization*/
-Id game_get_object_location(Game* game)
+Object* object_get_by_id(Game* game, Id id)
 {
+	
 	int i;
+	for(i=0; i<max; i++)
+	{
+		if(object_get_id(game->object[i]) == id)
+			return game->object[i];
+			
+	}
+	return NULL;
+}
+
+
+/*Getting object localization*/
+Id game_get_object_location(Game* game, Id id)
+{
+	int i,j;
+  Set* set=NULL;
 
 	for (i = 0;i<(MAX_SPACES+1);i++){
 		if(space_get_object(game->spaces[i])){
-			return space_get_id(game->spaces[i]); 	
+      for (j=0;j<set_get_number(Set* space_get_set(game->spaces[i]));j++){
+        set = space_get_set(spaces[i]);
+        if (!set_get_ids(set[j],id)){
+          return space_get_id(game->spaces[i]);
+        }
+      }
 		}
-	} 
+	}
 
 	return NO_ID;
 }
 /*Updating game after executing commands */
-STATUS game_update(Game* game, T_Command cmd) 
+STATUS game_update(Game* game, T_Command cmd)
 {
 	game->last_cmd = cmd;
-	(*game_callback_fn_list[cmd])(game);
+	//Paulina to Adrian: It should be removed
+	//(*game_callback_fn_list[cmd])(game);
 	return OK;
 }
 /*Getting the last command which was executed*/
-T_Command game_get_last_command(Game* game) 
+T_Command game_get_last_command(Game* game)
 {
 	return game->last_cmd;
 }
 /*Printing the game and showing the position of the object and player */
-void game_print_data(Game* game) 
+void game_print_data(Game* game)
 {
 	int i = 0;
 
 	printf("\n\n-------------\n\n");
 
 	printf("=> Spaces: \n");
-	for (i = 0; i < MAX_SPACES && game->spaces[i] != NULL; i++) 
+	for (i = 0; i < MAX_SPACES && game->spaces[i] != NULL; i++)
 	{
 		space_print(game->spaces[i]);
 	}
 
 	printf("=> Object location: %d\n", (int)game_get_object_location(game));
 	printf("=> Player location: %d\n", (int)player_get_location(game->player));
+  //??????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????
 	printf("prompt:> ");
 }
 /*Checking if the game is over*/
@@ -186,7 +239,7 @@ void game_callback_unknown(Game* game) {}
 
 void game_callback_exit(Game* game) {}
 /*Moving one step forward*/
-void game_callback_following(Game* game) 
+void game_callback_following(Game* game)
 {
 	int i = 0;
 	Id current_id = NO_ID;
@@ -199,7 +252,7 @@ void game_callback_following(Game* game)
 		return;
 	}
 	//Execute a loop until "i" exceeds the value of the determined maximum size of space or the end of the list of created spaces
-	for (i = 0; i < MAX_SPACES && game->spaces[i] != NULL; i++) 
+	for (i = 0; i < MAX_SPACES && game->spaces[i] != NULL; i++)
 	{
 		current_id = space_get_id(game->spaces[i]);
 		//Comparing whether the field is the one on which the player is standing
@@ -217,7 +270,7 @@ void game_callback_following(Game* game)
 	}
 }
 /* Return to the previous position*/
-void game_callback_previous(Game* game) 
+void game_callback_previous(Game* game)
 {
 	int i = 0;
 	Id current_id = NO_ID;
@@ -247,72 +300,132 @@ void game_callback_previous(Game* game)
 		}
 	}
 }
-//In the function argument, enter the space id from which you want to pick up the object
-void game_callback_pick_up(Game* game)
-{
-	int i = 0;
+void game_callback_graps(Game* game, Id object) {
+	int i ;
 	Id current_id = NO_ID;
 	Id space_id = NO_ID;
 	//player location is assigned to a variable "space_id"
 	space_id = game_get_player_location(game);
 	//If the "space_id" still equals to "NO_ID", exit
-	
 	if (NO_ID == space_id)
 	{
 		return;
 	}
-	Space* space = game->spaces[space_id];
-	//Execute a loop until "i" exceeds the value of the determined maximum size of space or the end of the list of created spaces
 	for (i = 0; i < MAX_SPACES && game->spaces[i] != NULL; i++)
 	{
 		current_id = space_get_id(game->spaces[i]);
 		//Comparing whether the field is the one on which the player is standing
 		if (current_id == space_id)
 		{
-			if(player_get_object(game->player) == NULL  && space_get_object(space) != NULL)
+			if (!set_get_ids(game->spaces[i]->object, object))
+				return;
+			if (player_get_object(game->player) == NO_ID)
 			{
-				//assigning the object to the player
-				player_set_object(game->player,space_get_object(space));
-				//There is no object in the given space right now
-				space_set_object(space, NULL);
-			}
-			return;
-			
-		}
-	}
-}
-//In the function argument, enter space id on which you want to place the object
-void game_callback_put_in_place(Game* game)
-{		
-	int i = 0;
-	Id current_id = NO_ID;
-	Id space_id = NO_ID;
-	//player location is assigned to a variable "space_id"
-	space_id = game_get_player_location(game);
-	//If the "space_id" still equals to "NO_ID", exit
-	
-	if (NO_ID == space_id)
-	{
-		return;
-	}
-	Space* space = game->spaces[space_id];
-	// Right now, we have only one object so we can get it from game but next time it should be from player
-	Object* object = game->object;
-	//Execute a loop until "i" exceeds the value of the determined maximum size of space or the end of the list of created spaces
-	for (i = 0; i < MAX_SPACES && game->spaces[i] != NULL; i++)
-	{
-		current_id = space_get_id(game->spaces[i]);
-		//Comparing whether the field is the one on which the player is standing
-		if (current_id == space_id)
-		{
-			if(player_get_object(game->player) != NULL  && space_get_object(space) == NULL)
-			{
-				// Setting the object on this space
-				space_set_object(space, object); 
-				
+				player_set_object(game->player, object);
+
+				space_remove_object(game->spaces[i], object_get_by_id(object));
 			}
 			return;
 		}
 	}
+
 }
 
+void game_callback_drop(Game* game) {
+	int i = 0; 
+	Id current_id = NO_ID;
+	Id space_id = NO_ID;
+	//player location is assigned to a variable "space_id"
+	space_id = game_get_player_location(game);
+	//If the "space_id" still equals to "NO_ID", exit
+	if (NO_ID == space_id)
+	{
+		return;
+	}
+	for (i = 0; i < MAX_SPACES && game->spaces[i] != NULL; i++)
+	{
+		current_id = space_get_id(game->spaces[i]);
+		//Comparing whether the field is the one on which the player is standing
+		if (current_id == space_id)
+		{
+
+			if (player_get_object(game->player) != NO_ID)
+			{
+				space_add_object(game->spaces[i],object_get_by_id(object) );
+				
+				//assigning the object to the player
+				player_set_object(game->player, NO_ID);
+			}
+			return;
+		}
+	}
+
+}
+
+
+void game_callback_left(Game* game, Id id) {
+	int i = 0;
+	Id current_id = NO_ID;
+	Id space_id = NO_ID;
+	//player location is assigned to a variable "space_id"
+	space_id = game_get_player_location(game);
+	//If the "space_id" still equals to "NO_ID", exit
+	if (NO_ID == space_id)
+	{
+		return;
+	}
+	for (i = 0; i < MAX_SPACES && game->spaces[i] != NULL; i++)
+	{
+		current_id = space_get_id(game->spaces[i]);
+		//Comparing whether the field is the one on which the player is standing
+		if(current_id == space_id)
+		{
+			current_id = space_get_west(game->spaces[i]);
+			if (current_id != NO_ID)
+			{
+				game_callback_graps(game, id);
+				game_set_player_location(game, current_id);
+				game_callback_drop(game);
+			}
+			return;
+		}
+	}
+
+}
+void game_callback_right(Game* game, Id id) {
+	int i = 0;
+	Id current_id = NO_ID;
+	Id space_id = NO_ID;
+	//player location is assigned to a variable "space_id"
+	space_id = game_get_player_location(game);
+	//If the "space_id" still equals to "NO_ID", exit
+	if (NO_ID == space_id)
+	{
+		return;
+	}
+	for (i = 0; i < MAX_SPACES && game->spaces[i] != NULL; i++)
+	{
+		current_id = space_get_id(game->spaces[i]);
+		//Comparing whether the field is the one on which the player is standing
+		if (current_id == space_id)
+		{
+			current_id = space_get_east(game->spaces[i]);
+			if (current_id != NO_ID)
+			{
+				game_callback_graps(game, id);
+				game_set_player_location(game, current_id);
+				game_callback_drop(game);
+			}
+			return;
+		}
+	}
+
+}
+
+void game_callback_roll_the_dice(Game* game){
+  //Rolling the dice
+  dice_roll(game->dice);
+
+  return;
+
+}

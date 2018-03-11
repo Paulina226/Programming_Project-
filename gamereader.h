@@ -19,5 +19,6 @@ STATUS game_load_spaces(Game* game, char* filename);
 STATUS game_add_space(Game* game, Space* space);
 Id     game_get_space_id_at(Game* game, Id Id);
 Space* game_get_space(Game* game, Id id);
+STATUS game_load_objects(Game* game, char* filename);
 
 #endif

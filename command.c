@@ -13,13 +13,13 @@
 #include "command.h"
 
 #define CMD_LENGHT 40
-#define N_CMD 7
+#define N_CMD 10
 
 /*Codifies player inputs if they are a string*/
-char *cmd_to_str[N_CMD] = { "No command", "Unknown", "Exit", "Following", "Previous", "Pick up" , "Put in place" };
+char *cmd_to_str[N_CMD] = { "No command", "Unknown", "Exit", "Following", "Previous", "Graps" , "Drop", "Left " , "Right" ,"Roll the dice" };
 
 /*Codifies player inputs if they are a single character*/
-char *short_cmd_to_str[N_CMD] = { "","","e","f","p","u","i" };
+char *short_cmd_to_str[N_CMD] = { "","","e","f","p","g","d","l","r","t" };
 
 /*Functions used to read the user inputs and codify them for later use*/
 T_Command get_user_input()

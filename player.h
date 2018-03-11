@@ -20,12 +20,12 @@ Player* player_create(Id id);
 STATUS player_destroy(Player* player);
 STATUS player_set_name(Player* player, char* name);
 STATUS player_set_id(Player* player, Id id);
-STATUS player_set_object(Player* player, Object* object);
+STATUS player_set_object(Player* player, Id object);
 STATUS player_set_location(Player* player, Id id);
 Id player_get_id(Player* player);
 Id player_get_location(Player* player);
 const char* player_get_name(Player* player);
-Object* player_get_object(Player* player);
+Id player_get_object(Player* player);
 STATUS player_print(Player* player);
 
 #endif

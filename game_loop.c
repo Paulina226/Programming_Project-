@@ -10,6 +10,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "graphic_engine.h"
 #include "object.h"
 #include "player.h"
@@ -17,10 +18,21 @@
 
 int main(int argc, char *argv[]) {
 	Game game;
+	FILE f;
+	int i;
 
 	T_Command command = NO_CMD;
 
 	Graphic_engine *gengine;
+
+	for(i=0;i<argc;i++){
+
+		if (strcmp(argv[i],"-l")){
+
+			f = fopen(argv[i+1],w);
+
+		}
+	}
 
 	/*Game opening error detections notifications*/
 	if (argc < 2)
@@ -53,6 +65,8 @@ int main(int argc, char *argv[]) {
 
 		command = get_user_input();
 
+		///////aqui va la escritura del comando en el archivo (¿como obtengo el return del comando?)
+
 		game_update(&game, command);
 	}
 
@@ -60,6 +74,8 @@ int main(int argc, char *argv[]) {
 	game_destroy(&game);
 
 	graphic_engine_destroy(gengine);
+
+	fclose(f);
 
 	return 0;
 }

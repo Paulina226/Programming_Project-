@@ -219,11 +219,8 @@ Set* space_get_set(Space* space)
 	return space->object;
 }
 
-STATUS space_add_object(Space* space, Id id) {
 
-	add_value(space->object, id);
-	return OK;
-}
+/*Adding a new object into space */
 STATUS space_set_object(Space* space, Object* object)
 {
 	if (!space || !object)
@@ -236,9 +233,15 @@ STATUS space_set_object(Space* space, Object* object)
 	{
 		return ERROR;
 	}
-	space_add_object(space, object->id);
+	add_value(space->object, object_get_id(object));
 	return OK;
 }
+STATUS space_remove_object(Space* space, Object* object) {
+
+	remove_value(space->object, object->id);
+	return OK;
+}
+
 /*Showing linked between directions. If there is a connection, it will display the index of the item. In another case,
 it will display a message of no link.*/
 STATUS space_print(Space* space)

@@ -19,8 +19,11 @@ typedef enum enum_Command {
 	EXIT,
 	FOLLOWING,
 	PREVIOUS,
-	PICK_UP,
-	PUT_IN_PLACE
+	GRAPS,
+	DROP,
+	LEFT,
+	RIGHT
+	ROLL_THE_DICE
 } T_Command;
 
 /*Declaration of the public function of the command interpreter module*/

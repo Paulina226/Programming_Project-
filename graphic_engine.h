@@ -2,9 +2,9 @@
  * @brief It defines a textual graphic engine
  *
  * @file graphic_engine.h
- * @author Profesores PPROG
- * @version 1.0
- * @date 18-01-2017
+ * @author Paulina Kasperkiewicz
+ * @version 2.0
+ * @date 11-03-2017
  * @copyright GNU Public License
  */
 
